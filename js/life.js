@@ -48,36 +48,13 @@ Life.prototype = {
 
       newCoordinatesHash[x][y] = this.getNewState(x, y, this.getState(x, y));
 
-      if (this.isAccessible(x-1, y-1)) {
-        newCoordinatesHash[x-1][y-1] = this.getNewState(x-1, y-1, this.getState(x-1, y-1));
-      }
-
-      if (this.isAccessible(x-1, y)) {
-        newCoordinatesHash[x-1][y] = this.getNewState(x-1, y, this.getState(x-1, y));
-      }
-
-      if (this.isAccessible(x-1, y+1)) {
-        newCoordinatesHash[x-1][y+1] = this.getNewState(x-1, y+1, this.getState(x-1, y+1));
-      }
-
-      if (this.isAccessible(x, y-1)) {
-        newCoordinatesHash[x][y-1] = this.getNewState(x, y-1, this.getState(x, y-1));
-      }
-
-      if (this.isAccessible(x, y+1)) {
-        newCoordinatesHash[x][y+1] = this.getNewState(x, y+1, this.getState(x, y+1));
-      }
-
-      if (this.isAccessible(x+1, y-1)) {
-        newCoordinatesHash[x+1][y-1] = this.getNewState(x+1, y-1, this.getState(x+1, y-1));
-      }
-
-      if (this.isAccessible(x+1, y)) {
-        newCoordinatesHash[x+1][y] = this.getNewState(x+1, y, this.getState(x+1, y));
-      }
-
-      if (this.isAccessible(x+1, y+1)) {
-        newCoordinatesHash[x+1][y+1] = this.getNewState(x+1, y+1, this.getState(x+1, y+1));
+      var nearestCoordinates = this.getNearestCoordinates(x, y);
+      for (var coordinate in nearestCoordinates) {
+        var u = nearestCoordinates[coordinate][0];
+        var v = nearestCoordinates[coordinate][1];
+        if (this.isAccessible(u, v)) {
+          newCoordinatesHash[u][v] = this.getNewState(u, v, this.getState(u, v));
+        }
       }
     }
 
@@ -121,6 +98,13 @@ Life.prototype = {
     return a;
   },
 
+  getNearestCoordinates: function(x,y) {
+    return [
+      [x-1, y-1], [x-1, y], [x-1, y+1], [x, y-1],
+      [x, y+1], [x+1, y-1], [x+1, y], [x+1, y+1]
+    ];
+  },
+
   isAccessible: function(x, y) {
     x = parseInt(x);
     y = parseInt(y);
@@ -139,41 +123,20 @@ Life.prototype = {
     y = parseInt(y);
     s = parseInt(s);
 
-    if (this.isAccessible(x-1, y-1) && this.getState(x-1, y-1)) {
-      k = k + 1;
+    var nearestCoordinates = this.getNearestCoordinates(x, y);
+    for (var coordinate in nearestCoordinates) {
+      var u = nearestCoordinates[coordinate][0];
+      var v = nearestCoordinates[coordinate][1];
+      if (this.isAccessible(u, v) && this.getState(u, v)) {
+        k = k + 1;
+      }
     }
 
-    if (this.isAccessible(x-1, y) && this.getState(x-1, y)) {
-      k = k + 1;
-    }
 
-    if (this.isAccessible(x-1, y+1) && this.getState(x-1, y+1)) {
-      k = k + 1;
-    }
-
-    if (this.isAccessible(x, y-1) && this.getState(x, y-1)) {
-      k = k + 1;
-    }
-
-    if (this.isAccessible(x, y+1) && this.getState(x, y+1)) {
-      k = k + 1;
-    }
-
-    if (this.isAccessible(x+1, y-1) && this.getState(x+1, y-1)) {
-      k = k + 1;
-    }
-
-    if (this.isAccessible(x+1, y) && this.getState(x+1, y)) {
-      k = k + 1;
-    }
-
-    if (this.isAccessible(x+1, y+1) && this.getState(x+1, y+1)) {
-      k = k + 1;
-    }
-
-    if ((k == 2 || k == 3) && s == 1) {
-      return 1;
-    } else if (k == 3 && s == 0) {
+    if (
+        (k == 2 || k == 3) && s == 1
+      || k == 3 && s == 0
+    ) {
       return 1;
     } else {
       return 0;
